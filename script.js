@@ -1,15 +1,10 @@
 const keyboard = {
   elements: {
     main: null,
+    textarea: [],
     keysContainer: null,
     keys: [],
   },
-
-  // eventHandlers: {
-  //   oninput: null,
-  //   onkeydown: null,
-  //   onkeyup: null,
-  // },
 
   properties: {
     value: '',
@@ -19,9 +14,16 @@ const keyboard = {
 
   init() {
     this.elements.main = document.createElement('div');
+    const wrapper = document.createElement('div');
+    wrapper.classList.add('keyboard-wrapper');
+
+    this.elements.textarea = document.createElement('textarea');
+    
+    this.elements.textarea.placeholder = "Type your text ...";
+    this.elements.textarea.classList.add('textarea');
     this.elements.keysContainer = document.createElement('div');
 
-    this.elements.main.classList.add('keyboard', '1keyboard__hidden');
+    this.elements.main.classList.add('keyboard');
     this.elements.keysContainer.classList.add('keyboard__keys');
     this.elements.keysContainer.appendChild(this._createKeys());
     this.elements.keysContainer.querySelectorAll('.keyboard__key');
@@ -30,17 +32,8 @@ const keyboard = {
 
     this.elements.main.appendChild(this.elements.keysContainer);
 
-    document.body.appendChild(this.elements.main);
-
-    document.querySelectorAll('.textarea').forEach((element) => {
-      element.addEventListener('focus', (e, curr) => {
-        this.properties.values = e || '';
-        e.value += curr;
-        // this.open(element.value, (currentValue) => {
-        //   element.value += currentValue;
-        // });
-      });
-    });
+    document.body.append(wrapper);
+    wrapper.append(this.elements.main, this.elements.textarea);
 
     document.addEventListener('keydown', this.onkeydown);
     document.addEventListener('keyup', this.onkeyup);
@@ -69,20 +62,20 @@ const keyboard = {
         code: 'Backquote',
         value: '`',
         shiftEn: '~',
-        valueUk: 'Ґ',
+        shiftUk: 'Ґ',
         shiftRu: '[]',
       },
       {
         code: 'Digit1',
         value: '1',
         shiftEn: '!',
-        valueUk: '!',
+        shiftUk: '!',
       },
       {
         code: 'Digit2',
         value: '2',
         shiftEn: '"',
-        valueUk: '@',
+        shiftUk: '@',
         shiftRu: '@',
       },
       {
@@ -90,27 +83,27 @@ const keyboard = {
         value: '3',
         shiftEn: '#',
         shiftRu: '№',
-        valueUk: '№',
+        shiftUk: '№',
       },
       {
         code: 'Digit4',
         value: '4',
         shiftEn: '$',
-        valueUk: ';',
+        shiftUk: ';',
         shiftRu: '%',
       },
       {
         code: 'Digit5',
         value: '5',
         shiftEn: '%',
-        valueUk: '%',
+        shiftUk: '%',
         shiftRu: ':',
       },
       {
         code: 'Digit6',
         value: '6',
         shiftEn: '^',
-        valueUk: ':',
+        shiftUk: ':',
         shiftRu: ',',
       },
       {
@@ -118,37 +111,37 @@ const keyboard = {
         value: '7',
         shiftEn: '&',
         shiftRu: '.',
-        valueUk: '?',
+        shiftUk: '?',
       },
       {
         code: 'Digit8',
         value: '8',
         shiftEn: '*',
-        valueUk: ';',
+        shiftUk: ';',
       },
       {
         code: 'Digit9',
         value: '9',
         shiftEn: '(',
-        valueUk: '('
+        shiftUk: '('
       },
       {
         code: 'Digit0',
         value: '0',
         shiftEn: ')',
-        valueUk: ')'
+        shiftUk: ')'
       },
       {
         code: 'Minus',
         value: '-',
         shiftEn: '_',
-        valueUk: '_'
+        shiftUk: '_'
       },
       {
         code: 'Equal',
         value: '=',
         shiftEn: '+',
-        valueUk: '+'
+        shiftUk: '+'
       },
       {
         code: 'Backspace',
@@ -464,6 +457,8 @@ const keyboard = {
     keyLayout.forEach((key) => {
       let keyText = key.value;
       const keyElement = document.createElement('button');
+    
+
       const insertLineBreak =
         ['Backspace', 'Del', 'Enter', 'ShiftRight'].indexOf(key.code) !== -1;
       keyElement.setAttribute('id', `${key.code}`);
@@ -558,14 +553,7 @@ const keyboard = {
           keyElement.classList.add('keyboard__key-dbl');
           keyElement.innerHTML = createIconHTML('language');
           keyElement.addEventListener('click', (e) => {
-
-            //const keyValue = this.properties.currLang;
             this.onchangeVirtual(e);
-            // if (keyValue === 'En') {
-            //   this.elements.keys = this.properties.valueUk;
-            //  keyValue === this.elements.keys;
-            //   this.onVirtualKeydown(keyValue, keyElement);
-            // }
           });
           break;
 
@@ -664,13 +652,22 @@ const keyboard = {
 
         default:
 
-        if (this.properties.currLang === 'Uk') {
+        if (this.properties.currLang === 'Uk' && key.valueUk) {
             keyText = key.valueUk;
           }
             keyElement.innerHTML = keyText;
           
           keyElement.addEventListener('click', () => {
-            
+            const textarea = document.querySelector('textarea');
+
+            // const pos = textarea.selectionStart;
+            // const value = textarea.value;
+            // textarea.value = value.slice(0, pos - 1) + value;
+            // keyElement.blur();
+            // textarea.focus();
+            // textarea.selectionStart = pos;
+            // textarea.selectionEnd = pos;
+
             let keyValue = this.properties.capsLock
               ? keyText.toUpperCase()
               : keyText.toLowerCase();
