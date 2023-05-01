@@ -45,6 +45,7 @@ const keyboard = {
     document.addEventListener('keydown', this.onkeydown);
     document.addEventListener('keyup', this.onkeyup);
     document.addEventListener('keydown', this.onclickAltShift);
+    document.addEventListener('change', this.onchangeVirtual);
   },
 
   onkeydown(event) {
@@ -60,6 +61,7 @@ const keyboard = {
   },
 
   _createKeys() {
+    console.log('function+++++++++++')
     const fragment = document.createDocumentFragment();
 
     const keyLayout = [
@@ -67,20 +69,20 @@ const keyboard = {
         code: 'Backquote',
         value: '`',
         shiftEn: '~',
-        shiftUk: 'Ґ',
+        valueUk: 'Ґ',
         shiftRu: '[]',
       },
       {
         code: 'Digit1',
         value: '1',
         shiftEn: '!',
-        shiftUk: '',
+        valueUk: '!',
       },
       {
         code: 'Digit2',
         value: '2',
         shiftEn: '"',
-        shiftUk: '@',
+        valueUk: '@',
         shiftRu: '@',
       },
       {
@@ -88,27 +90,27 @@ const keyboard = {
         value: '3',
         shiftEn: '#',
         shiftRu: '№',
-        shiftUk: '№',
+        valueUk: '№',
       },
       {
         code: 'Digit4',
         value: '4',
         shiftEn: '$',
-        shiftUk: ';',
+        valueUk: ';',
         shiftRu: '%',
       },
       {
         code: 'Digit5',
         value: '5',
         shiftEn: '%',
-        shiftUk: '%',
+        valueUk: '%',
         shiftRu: ':',
       },
       {
         code: 'Digit6',
         value: '6',
         shiftEn: '^',
-        shiftUk: ':',
+        valueUk: ':',
         shiftRu: ',',
       },
       {
@@ -116,33 +118,37 @@ const keyboard = {
         value: '7',
         shiftEn: '&',
         shiftRu: '.',
-        shiftUk: '?',
+        valueUk: '?',
       },
       {
         code: 'Digit8',
         value: '8',
         shiftEn: '*',
-        shiftUk: ';',
+        valueUk: ';',
       },
       {
         code: 'Digit9',
         value: '9',
         shiftEn: '(',
+        valueUk: '('
       },
       {
         code: 'Digit0',
         value: '0',
         shiftEn: ')',
+        valueUk: ')'
       },
       {
         code: 'Minus',
         value: '-',
         shiftEn: '_',
+        valueUk: '_'
       },
       {
         code: 'Equal',
         value: '=',
         shiftEn: '+',
+        valueUk: '+'
       },
       {
         code: 'Backspace',
@@ -388,7 +394,7 @@ const keyboard = {
         code: 'ArrowUp',
         value: '&#8593;',
         valueRu: '',
-        valueUk: '',
+        valueUk: '&#8593;',
       },
       {
         code: 'ShiftRight',
@@ -403,8 +409,8 @@ const keyboard = {
         valueUk: '',
       },
       {
-        code: 'MetaLeft',
-        value: 'Meta',
+        code: 'Lang',
+        value: 'Lang',
         valueRu: 'Ru',
         valueUk: 'Uk',
         valueEn: 'En',
@@ -431,19 +437,19 @@ const keyboard = {
         code: 'ArrowLeft',
         value: '&#8592;',
         valueRu: '',
-        valueUk: '',
+        valueUk: '&#8592;',
       },
       {
         code: 'ArrowDown',
         value: '&#8595;',
         valueRu: '',
-        valueUk: '',
+        valueUk: '&#8595;',
       },
       {
         code: 'ArrowRight',
         value: '&#8594;',
         valueRu: '',
-        valueUk: '',
+        valueUk: '&#8594;',
       },
       {
         code: 'ControlRight',
@@ -456,6 +462,7 @@ const keyboard = {
       return `<i class="material-icons">${icon_name}</i>`;
     };
     keyLayout.forEach((key) => {
+      let keyText = key.value;
       const keyElement = document.createElement('button');
       const insertLineBreak =
         ['Backspace', 'Del', 'Enter', 'ShiftRight'].indexOf(key.code) !== -1;
@@ -475,6 +482,7 @@ const keyboard = {
           'AltLeft',
           'AltRight',
           'Tab',
+          'Lang'
         ].includes(key.code)
       ) {
         keyElement.classList.add('keyboard__letters');
@@ -546,12 +554,18 @@ const keyboard = {
           });
           break;
 
-        case 'MetaLeft':
+        case 'Lang':
           keyElement.classList.add('keyboard__key-dbl');
           keyElement.innerHTML = createIconHTML('language');
-          keyElement.addEventListener('click', () => {
-            const keyValue = this.properties.currLang;
-            this.onVirtualKeydown(keyValue, keyElement);
+          keyElement.addEventListener('click', (e) => {
+
+            //const keyValue = this.properties.currLang;
+            this.onchangeVirtual(e);
+            // if (keyValue === 'En') {
+            //   this.elements.keys = this.properties.valueUk;
+            //  keyValue === this.elements.keys;
+            //   this.onVirtualKeydown(keyValue, keyElement);
+            // }
           });
           break;
 
@@ -649,13 +663,17 @@ const keyboard = {
           break;
 
         default:
-          keyElement.innerHTML = key.value;
 
+        if (this.properties.currLang === 'Uk') {
+            keyText = key.valueUk;
+          }
+            keyElement.innerHTML = keyText;
+          
           keyElement.addEventListener('click', () => {
-            console.log('Key pressed');
+            
             let keyValue = this.properties.capsLock
-              ? key.value.toUpperCase()
-              : key.value.toLowerCase();
+              ? keyText.toUpperCase()
+              : keyText.toLowerCase();
             this.onVirtualKeydown(keyValue, keyElement);
           });
 
@@ -668,32 +686,25 @@ const keyboard = {
     });
     return fragment;
   },
-  // onchangeVirtual (event){
-  //   switch (event.target.value) {
-  //     case 'Ru':
-  //       keyboard.
-  //   }
+  onchangeVirtual (){
+    keyboard.properties.currLang === 'En'
+            ? (keyboard.properties.currLang = 'Uk')
+            : (keyboard.properties.currLang = 'En');
+            keyboard.elements.keysContainer.innerHTML = '';
+            keyboard.elements.keysContainer.appendChild(keyboard._createKeys());
+          console.log('yes__________________', keyboard.properties.currLang);
+  },
 
-  // },
-  onclickAltShift(event) {
+  onclickAltShift (event) {
     if (event.code === 'AltLeft') {
       document.addEventListener('keyup', function (e) {
         if (e.code === 'ShiftLeft') {
-          // switch (keyboard.properties.currLang) {
-          //   case 'En':
-          //     keyboard.properties.currLang = 'Uk';
-          //     break;
-          //   case 'Uk':
-          //     keyboard.properties.currLang = 'En';
-          //
-          //     break;
-          //   default:
-          //     keyboard.properties.currLang = 'En';
-          //     break;
-          // }
-          keyboard.properties.currLang === 'En'
-            ? (keyboard.properties.currLang = 'Uk')
-            : (keyboard.properties.currLang = 'En');
+          keyboard.onchangeVirtual();
+          // keyboard.properties.currLang === 'En'
+          //   ? (keyboard.properties.currLang = 'Uk')
+          //   : (keyboard.properties.currLang = 'En');
+          //   keyboard.elements.keysContainer.innerHTML = '';
+          //   keyboard.elements.keysContainer.appendChild(keyboard._createKeys());
           console.log('yes__________________', keyboard.properties.currLang);
         }
       });
