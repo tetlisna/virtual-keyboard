@@ -552,7 +552,7 @@ class Keyboard {
           break;
 
         case 'Lang':
-          keyElement.classList.add('keyboard__key-dbl');
+          keyElement.classList.add('keyboard__key');
           keyElement.innerHTML = createIconHTML('language');
           keyElement.addEventListener('click', (e) => {
             this.onchangeVirtual(e);
@@ -613,10 +613,6 @@ class Keyboard {
         case 'AltRight':
           keyElement.classList.add('keyboard__key', 'alt-right');
           keyElement.innerText = 'Alt';
-          // keyElement.addEventListener('click', () => {
-          //   const keyValue = code;
-          //   this.onVirtualKeydown(keyValue, keyElement);
-          // });
 
           break;
 
