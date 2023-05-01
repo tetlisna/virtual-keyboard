@@ -1,61 +1,62 @@
-const keyboard = {
-  elements: {
-    main: null,
-    keysContainer: null,
-    keys: [],
-  },
-
-  properties: {
+class Keyboard {
+  properties =  {
     value: '',
     currLang: 'En',
     capsLock: false,
-  },
+}
+  textarea = null
+  keysContainer = null
+  keys = []
 
-  init() {
-    this.elements.main = document.createElement('div');
+  constructor(){
     const wrapper = document.createElement('div');
     wrapper.classList.add('keyboard-wrapper');
-    wrapper.innerText =
-      "Shortcut for switching a language: left Alt+Shift, on virtual keyboard - 'globe' button";
-    this.elements.textarea = document.createElement('textarea');
+    
+    const textarea = document.createElement('textarea');
+    textarea.placeholder = 'Type your text ...';
+    textarea.classList.add('textarea');
 
-    this.elements.textarea.placeholder = 'Type your text ...';
-    this.elements.textarea.classList.add('textarea');
-    this.elements.keysContainer = document.createElement('div');
+    this.textarea = textarea;
+    
+    
+    const keysContainer = document.createElement('div');
+    keysContainer.classList.add('keyboard__keys');
+    keysContainer.appendChild(this.createKeys());
 
-    this.elements.main.classList.add('keyboard');
-    this.elements.keysContainer.classList.add('keyboard__keys');
-    this.elements.keysContainer.appendChild(this._createKeys());
-    this.elements.keysContainer.querySelectorAll('.keyboard__key');
-    this.elements.keys =
-      this.elements.keysContainer.querySelectorAll('.keyboard__letters');
+    this.keysContainer = keysContainer;
+    
+    this.keys = keysContainer.querySelectorAll('.keyboard__letters');
 
-    this.elements.main.appendChild(this.elements.keysContainer);
+    const main = document.createElement('div');
+    main.classList.add('keyboard');
+    wrapper.innerText = 'Shortcut for switching a language: left Alt+Shift, on virtual keyboard - \'globe\' button';
 
     document.body.append(wrapper);
-    wrapper.append(this.elements.main, this.elements.textarea);
+    wrapper.append(main, textarea);
+    main.append(keysContainer);
 
+    this.addListeners();
+  }
+
+  addListeners(){
     document.addEventListener('keydown', this.onkeydown);
     document.addEventListener('keyup', this.onkeyup);
     document.addEventListener('keydown', this.onclickAltShift);
     document.addEventListener('change', this.onchangeVirtual);
-  },
+  }
 
-  onkeydown(event) {
-    const code = event.code;
-    const id = document.getElementById(code);
+  onkeydown(e){
+    const id = document.getElementById(e.code);
     id.classList.add('active');
-  },
+  }
 
-  onkeyup(event) {
-    const code = event.code;
-    const id = document.getElementById(code);
+  onkeyup(e){
+    const id = document.getElementById(e.code);
     id.classList.remove('active');
-  },
-
-  _createKeys() {
+  }
+  
+  createKeys() {
     const fragment = document.createDocumentFragment();
-
     const keyLayout = [
       {
         code: 'Backquote',
@@ -452,7 +453,7 @@ const keyboard = {
     ];
     const createIconHTML = (icon_name) => {
       return `<i class="material-icons">${icon_name}</i>`;
-    };
+    }
     keyLayout.forEach((key) => {
       const { code } = key;
       let keyText = key.value;
@@ -490,14 +491,14 @@ const keyboard = {
           );
           keyElement.innerText = 'Backspace';
           keyElement.addEventListener('click', () => {
-            const textarea = document.querySelector('textarea');
-            const pos = textarea.selectionStart;
-            const value = textarea.value;
-            textarea.value = value.slice(0, pos - 1) + value.slice(pos);
+            this.textarea = document.querySelector('textarea');
+            const pos = this.textarea.selectionStart;
+            const value =this.textarea.value;
+            this.textarea.value = value.slice(0, pos - 1) + value.slice(pos);
             keyElement.blur();
-            textarea.focus();
-            textarea.selectionStart = pos - 1;
-            textarea.selectionEnd = pos - 1;
+            this.textarea.focus();
+            this.textarea.selectionStart = pos - 1;
+            this.textarea.selectionEnd = pos - 1;
           });
 
           break;
@@ -526,7 +527,7 @@ const keyboard = {
           keyElement.innerText = 'Tab';
 
           keyElement.addEventListener('click', () => {
-            const keyValue = '    ';
+            const keyValue = `    `;
             this.onVirtualKeydown(keyValue, keyElement);
           });
 
@@ -537,10 +538,9 @@ const keyboard = {
             'keyboard__key-wide',
             'keyboard__key-activatable'
           );
-          //keyElement.innerHTML = createIconHTML('keyboard_capslock');
           keyElement.innerText = 'CapsLock';
           keyElement.addEventListener('click', () => {
-            this._toggleCapsLock();
+            this.toggleCapsLock();
             keyElement.classList.toggle(
               'keyboard__key-active',
               this.properties.capsLock
@@ -559,7 +559,6 @@ const keyboard = {
         case 'Enter':
           keyElement.classList.add('keyboard__key-wide');
           keyElement.innerHTML = createIconHTML('keyboard_return');
-
           keyElement.addEventListener('click', () => {
             const keyValue = '\n';
             this.onVirtualKeydown(keyValue, keyElement);
@@ -587,40 +586,24 @@ const keyboard = {
             'shift-right'
           );
           keyElement.innerText = 'Shift';
-          // keyElement.addEventListener('click', () => {
-          //   //const keyValue = key.code.innerHTML;
-          //   this.onVirtualKeydown(keyValue, keyElement);
-          // });
 
           break;
 
         case 'ControlLeft':
           keyElement.classList.add('keyboard__key', 'keyboard__key-dbl');
           keyElement.innerText = 'Ctrl';
-          // keyElement.addEventListener('click', () => {
-          //   const keyValue = key.code;
-          //   this.onVirtualKeydown(keyValue, keyElement);
-          // });
 
           break;
 
         case 'ControlRight':
           keyElement.classList.add('keyboard__key', 'keyboard__key-dbl');
           keyElement.innerText = 'Ctrl';
-          // keyElement.addEventListener('click', () => {
-          //   const keyValue = key.code;
-          //   this.onVirtualKeydown(keyValue, keyElement);
-          // });
 
           break;
 
         case 'AltLeft':
           keyElement.classList.add('keyboard__key', 'alt-left');
           keyElement.innerText = 'Alt';
-          // keyElement.addEventListener('click', () => {
-          //   const keyValue = key.code;
-          //   this.onVirtualKeydown(keyValue, keyElement);
-          // });
 
           break;
 
@@ -640,12 +623,6 @@ const keyboard = {
             const keyValue = ' ';
             this.onVirtualKeydown(keyValue, keyElement);
           });
-
-          break;
-
-        case 'Done':
-          keyElement.classList.add('keyboard__key-wide', 'keyboard__key-dark');
-          //keyElement.innerHTML = createIconHTML('check_circle');
 
           break;
 
@@ -670,47 +647,49 @@ const keyboard = {
       }
     });
     return fragment;
-  },
-  onchangeVirtual() {
-    keyboard.properties.currLang === 'En'
-      ? (keyboard.properties.currLang = 'Uk')
-      : (keyboard.properties.currLang = 'En');
-    keyboard.elements.keysContainer.innerHTML = '';
-    keyboard.elements.keysContainer.appendChild(keyboard._createKeys());
-  },
+  }
 
-  onclickAltShift(event) {
-    if (event.code === 'AltLeft') {
+  onchangeVirtual() {
+    console.dir(this);
+    this.properties.currLang === 'En'
+      ? (this.properties.currLang = 'Uk')
+      : (this.properties.currLang = 'En');
+      this.keysContainer.innerHTML = '';
+      this.keysContainer.appendChild(this.createKeys());
+  }
+
+  onclickAltShift(e){
+    if (e.code === 'AltLeft') {
       document.addEventListener('keyup', function (e) {
         if (e.code === 'ShiftLeft') {
-          keyboard.onchangeVirtual();
+          this.onchangeVirtual();
         }
       });
     }
-  },
+  }
 
-  onVirtualKeydown(value, keyElement) {
-    const textarea = document.querySelector('textarea');
-    const pos = textarea.selectionStart;
-    textarea.value =
-      textarea.value.slice(0, pos) + value + textarea.value.slice(pos);
+  onVirtualKeydown(value, keyElement){
+    const pos = this.textarea.selectionStart;
+    this.textarea.value =
+      this.textarea.value.slice(0, pos) + value + this.textarea.value.slice(pos);
     keyElement.blur();
-    textarea.focus();
-    textarea.selectionStart = pos + 1;
-    textarea.selectionEnd = pos + 1;
-  },
+    this.textarea.focus();
+    this.textarea.selectionStart = pos + value.length;
+    this.textarea.selectionEnd = pos + value.length;
+  }
 
-  _toggleCapsLock() {
+  toggleCapsLock() {
     this.properties.capsLock = !this.properties.capsLock;
-    for (const key of this.elements.keys) {
+    for (const key of this.keys) {
       if (key.childElementCount === 0) {
         key.textContent = this.properties.capsLock
           ? key.textContent.toUpperCase()
           : key.textContent.toLowerCase();
       }
     }
-  },
-};
+  }
+}
+
 window.addEventListener('DOMContentLoaded', () => {
-  keyboard.init();
+  new Keyboard();
 });
